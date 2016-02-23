@@ -11,7 +11,9 @@
 
 sender=$1
 message=$2
-notifyPattern='Edy|Edi|Eduard|Edouard|Eddie|Eddy|Enygma'
+## Using negative lookbehind and nevative lookforward regex features to make sure that non-intentional usage does not
+## trigger the notifications for names. Note: Requires Perl regexp support (-P argument) to be used in grep.
+notifyPattern='(?<!\w)(Edy|Edi|Eduard|Edouard|Eddie|Eddy|Enygma)(?!\w)'
 
 ## Skype 4.3 seems to include the "sender: " prefix in the actual message. Remove the prefix.
 message=${message#$sender: }
@@ -24,7 +26,7 @@ message=${message#$sender: }
 #shopt -s nocasematch; if [[ '%smessage' =~ .*(Edy)|(Eduard)|(Eddie)|(Eddy)|(Enygma).* ]]; then notify-send "$sernder mentioned you!" -i skype; fi
 
 ## Using grep
-if echo "$message" | grep -iqE $notifyPattern;
+if echo "$message" | grep -iqP $notifyPattern;
 then
   notify-send "$sender mentioned you on Skype!" -i skype;
   echo "$sender mentioned you on Skype!" | festival --tts;
